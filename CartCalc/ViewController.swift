@@ -6,14 +6,56 @@
 //
 
 import UIKit
+import AVFoundation
+import Vision
 
 class ViewController: UIViewController {
 
+    //MARK: - Properties
+    var captureSession: AVCaptureSession!
+    var stillImageOutput: AVCapturePhotoOutput!
+    var previewLayer: AVCaptureVideoPreviewLayer!
+    
+    //MARK: - Outlets
+    @IBOutlet var cameraView: UIView!
+    @IBOutlet var scanResultLabel: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        setupUI()
+        
     }
 
-
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        setupVideoCapture()
+    }
+    
+    //MARK: - Private methods
+    private func setupUI() {
+        cameraView.backgroundColor = .systemBackground
+        cameraView.layer.cornerRadius = 12.0
+        cameraView.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+        cameraView.clipsToBounds = true
+    }
+    
+    private func setupVideoCapture() {
+        captureSession = AVCaptureSession()
+        captureSession.sessionPreset = .medium
+        
+        guard let captureDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) else {
+            print("Failed to access camera device.")
+            return
+        }
+        
+        guard let input = try? AVCaptureDeviceInput(device: captureDevice) else { return }
+        
+        captureSession.addInput(input)
+        previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
+        previewLayer.videoGravity = AVLayerVideoGravity.resizeAspectFill
+        previewLayer.frame = cameraView.frame
+        cameraView.layer.insertSublayer(previewLayer, at: 0)
+        captureSession.startRunning()
+    }
 }
 
