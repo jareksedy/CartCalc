@@ -29,12 +29,26 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ng1-6e-IPl">
+                                <rect key="frame" x="25" y="737" width="364" height="75"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="75" id="qHh-Ya-RCQ"/>
+                                </constraints>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="tinted" title="Capture"/>
+                                <connections>
+                                    <action selector="captureButtonPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="jyE-Ub-jsj"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="xKM-H1-lfR" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="0jh-Eg-tEf"/>
                             <constraint firstItem="Hq9-Vo-Vfr" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="25" id="9YR-gx-s4o"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="ng1-6e-IPl" secondAttribute="bottom" constant="50" id="IPO-Pk-qtK"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="ng1-6e-IPl" secondAttribute="trailing" constant="25" id="NNz-nH-iJo"/>
+                            <constraint firstItem="ng1-6e-IPl" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="25" id="X7F-wP-geH"/>
                             <constraint firstItem="xKM-H1-lfR" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="dD8-9K-6PF"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="Hq9-Vo-Vfr" secondAttribute="trailing" constant="25" id="xN4-TI-OJe"/>
                             <constraint firstItem="Hq9-Vo-Vfr" firstAttribute="top" secondItem="xKM-H1-lfR" secondAttribute="bottom" constant="50" id="xgV-c1-OLz"/>
@@ -43,12 +57,13 @@
                     </view>
                     <connections>
                         <outlet property="cameraView" destination="xKM-H1-lfR" id="fEQ-0u-WQJ"/>
+                        <outlet property="captureButton" destination="ng1-6e-IPl" id="NYm-fD-pbd"/>
                         <outlet property="scanResultLabel" destination="Hq9-Vo-Vfr" id="D4w-oW-j0S"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="35" y="84"/>
+            <point key="canvasLocation" x="34.782608695652179" y="83.705357142857139"/>
         </scene>
     </scenes>
     <resources>

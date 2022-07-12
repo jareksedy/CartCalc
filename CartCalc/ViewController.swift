@@ -19,7 +19,9 @@ class ViewController: UIViewController {
     //MARK: - Outlets
     @IBOutlet var cameraView: UIView!
     @IBOutlet var scanResultLabel: UILabel!
+    @IBOutlet var captureButton: UIButton!
     
+    //MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -29,6 +31,11 @@ class ViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         setupVideoCapture()
+    }
+    
+    //MARK: - Actions
+    
+    @IBAction func captureButtonPressed(_ sender: Any) {
     }
     
     //MARK: - Private methods
@@ -41,7 +48,7 @@ class ViewController: UIViewController {
     
     private func setupVideoCapture() {
         captureSession = AVCaptureSession()
-        captureSession.sessionPreset = .medium
+        captureSession.sessionPreset = .vga640x480
         
         guard let captureDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) else {
             print("Failed to access camera device.")
