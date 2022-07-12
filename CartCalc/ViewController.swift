@@ -36,6 +36,21 @@ class ViewController: UIViewController {
     //MARK: - Actions
     
     @IBAction func captureButtonPressed(_ sender: Any) {
+        captureSession.stopRunning()
+        
+        let renderer = UIGraphicsImageRenderer(size: cameraView.bounds.size)
+        
+        let image = renderer.image { ctx in
+            view.drawHierarchy(in: cameraView.bounds, afterScreenUpdates: true)
+        }
+        
+        guard let cgImage = image.cgImage else { return }
+        
+        let requestHandler = VNImageRequestHandler(cgImage: cgImage)
+        let request = VNRecognizeTextRequest(completionHandler: recognizeTextHandler)
+        
+        try? requestHandler.perform([request])
+
     }
     
     //MARK: - Private methods
@@ -63,6 +78,22 @@ class ViewController: UIViewController {
         previewLayer.frame = cameraView.frame
         cameraView.layer.insertSublayer(previewLayer, at: 0)
         captureSession.startRunning()
+    }
+    
+    private func recognizeTextHandler(request: VNRequest, error: Error?) {
+        guard let observations = request.results as? [VNRecognizedTextObservation] else { return }
+        
+        let recognizedStrings = observations.compactMap { observation in
+            // Return the string of the top VNRecognizedText instance.
+            return observation.topCandidates(1).first?.string
+        }
+        
+        // Process the recognized strings.
+        processResults(recognizedStrings)
+    }
+    
+    private func processResults(_ recognizedStrings: [String]) {
+        print(recognizedStrings.count)
     }
 }
 
