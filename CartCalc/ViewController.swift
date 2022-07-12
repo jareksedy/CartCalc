@@ -12,20 +12,21 @@ import Vision
 class ViewController: UIViewController {
 
     //MARK: - Properties
+    var scanResults: [String] = []
     var captureSession: AVCaptureSession!
     var stillImageOutput: AVCapturePhotoOutput!
     var previewLayer: AVCaptureVideoPreviewLayer!
     
     //MARK: - Outlets
     @IBOutlet var cameraView: UIView!
-    @IBOutlet var scanResultLabel: UILabel!
     @IBOutlet var captureButton: UIButton!
+    @IBOutlet var scanResultsTableView: UITableView!
     
     //MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        scanResultsTableView.dataSource = self
         setupUI()
-        
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -34,23 +35,16 @@ class ViewController: UIViewController {
     }
     
     //MARK: - Actions
-    
     @IBAction func captureButtonPressed(_ sender: Any) {
-        captureSession.stopRunning()
-        
-        let renderer = UIGraphicsImageRenderer(size: cameraView.bounds.size)
-        
-        let image = renderer.image { ctx in
-            view.drawHierarchy(in: cameraView.bounds, afterScreenUpdates: true)
+        guard captureSession.isRunning
+        else {
+            captureButton.setTitle("Capture", for: .normal)
+            captureSession.startRunning()
+            return
         }
         
-        guard let cgImage = image.cgImage else { return }
-        
-        let requestHandler = VNImageRequestHandler(cgImage: cgImage)
-        let request = VNRecognizeTextRequest(completionHandler: recognizeTextHandler)
-        
-        try? requestHandler.perform([request])
-
+        let settings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.jpeg])
+        stillImageOutput.capturePhoto(with: settings, delegate: self)
     }
     
     //MARK: - Private methods
@@ -78,6 +72,15 @@ class ViewController: UIViewController {
         previewLayer.frame = cameraView.frame
         cameraView.layer.insertSublayer(previewLayer, at: 0)
         captureSession.startRunning()
+        
+        stillImageOutput = AVCapturePhotoOutput()
+        
+        guard captureSession.canAddOutput(stillImageOutput) else {
+            print("Can't add output")
+            return
+        }
+        
+        captureSession.addOutput(stillImageOutput)
     }
     
     private func recognizeTextHandler(request: VNRequest, error: Error?) {
@@ -93,7 +96,49 @@ class ViewController: UIViewController {
     }
     
     private func processResults(_ recognizedStrings: [String]) {
-        print(recognizedStrings.count)
+        scanResults = recognizedStrings
+        scanResultsTableView.reloadData()
+    }
+}
+
+extension ViewController: UITableViewDelegate, UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return scanResults.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = UITableViewCell()
+        cell.textLabel?.text = scanResults[indexPath.row]
+        return cell
+    }
+}
+
+extension ViewController: AVCapturePhotoCaptureDelegate {
+    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
+        guard error == nil else {
+            print(error!.localizedDescription)
+            return
+        }
+
+        guard let imageData = photo.fileDataRepresentation() else {
+            print("No data")
+            return
+        }
+
+        guard let cgImage = UIImage(data: imageData)?.cgImage else {
+            print("No image")
+            return
+        }
+        
+        captureButton.setTitle("Reset", for: .normal)
+        captureSession.stopRunning()
+
+        let requestHandler = VNImageRequestHandler(cgImage: cgImage)
+        let request = VNRecognizeTextRequest(completionHandler: recognizeTextHandler)
+
+        do { try requestHandler.perform([request]) } catch {
+            print("Unable to perform the requests: \(error).")
+        }
     }
 }
 
